@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrossDomainCredentials - Photostudy</title>
+  </head>
+  <script>
+    "use strict";
+    var allowedOrigins = ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002"];
+    var localStorageKey = "photostudy.crossDomainCredentials";
+    var postMessageEvent = {
+      REQUEST_CREDENTIALS: "request_credentials",
+      RETURN_CREDENTIALS: "return_credentials",
+      POST_LOGOUT: "post_logout",
+      LOGOUT: "logout",
+      SAVE_NEW_CREDENTIALS: "save_new_credentials",
+      SAVE_CREDENTIALS: "save_credentials",
+    }
+    function handlePostMessage(event) {
+      if (allowedOrigins.indexOf(event.origin) === -1) {
+        return;
+      }
+      console.log(`Received message from : `, event.origin, event.data);
+      switch (event.data.name) {
+        case postMessageEvent.REQUEST_CREDENTIALS: {
+          var localCredentialsData = localStorage.getItem(localStorageKey);
+          var credentials = {
+            name: postMessageEvent.RETURN_CREDENTIALS,
+            data: localCredentialsData ? JSON.parse(localCredentialsData) : {}
+          };
+          console.log(`Sending credentials to : `, event.origin, credentials);
+          event.source.postMessage(credentials, event.origin);
+          break;
+        }
+    
+        case postMessageEvent.POST_LOGOUT: {
+          var logout = {
+            name: postMessageEvent.LOGOUT,
+          };
+          event.source.postMessage(logout, event.origin);
+          localStorage.setItem(localStorageKey, JSON.stringify({}));
+          break;
+        }
+        case postMessageEvent.SAVE_NEW_CREDENTIALS: {
+          var newCredentials = event.data.data;
+          localStorage.setItem(localStorageKey, JSON.stringify(newCredentials));
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    }
+    window.addEventListener('message', handlePostMessage);
+  </script>
+  <body>
+    Ok
+  </body>
+</html>
