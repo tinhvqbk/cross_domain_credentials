@@ -27,13 +27,14 @@
         switch (event.data.name) {
             case postMessageEvent.REQUEST_CREDENTIALS: {
                  var localCredentialsData = localStorage.getItem(localStorageKey);
-                if (localCredentialsData) {
+                if (localCredentialsData && Object.keys(localCredentialsData).length > 0) {
                     event.source.postMessage({
                         name: postMessageEvent.RETURN_CREDENTIALS,
                         data: JSON.parse(localCredentialsData)
                     }, event.origin);
                 }
-                else {
+                
+                if (localCredentialsData && Object.keys(localCredentialsData).length === 0) { {
                     event.source.postMessage({
                         name: postMessageEvent.LOGOUT,
                     }, event.origin);
