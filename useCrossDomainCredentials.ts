@@ -5,7 +5,7 @@ export interface CrossDomainCredentialsConfig {
   iframeId?: string;
   iframeUrl: string;
   handleLogout: () => void;
-  handleLogin: (data: AnyObject) => void;
+  onReadyCredentials: (data: AnyObject) => void;
 }
 export interface CrossDomainCredentialsMessageEvent extends MessageEvent {
   source: Window;
@@ -53,7 +53,7 @@ export function useCrossDomainCredentials(
                 "message",
                 handleCrossDomainCredentialsMessage
               );
-              config.handleLogin(event.data.data);
+              config.onReadyCredentials(event.data.data);
               resolve(event.data.data);
               break;
             }
