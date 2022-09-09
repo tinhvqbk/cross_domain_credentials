@@ -26,12 +26,18 @@
         console.log(`Received message from : `, event.origin, event.data);
         switch (event.data.name) {
             case postMessageEvent.REQUEST_CREDENTIALS: {
-                var localCredentialsData = localStorage.getItem(localStorageKey);
-                var credentials = {
-                    name: postMessageEvent.RETURN_CREDENTIALS,
-                    data: localCredentialsData ? JSON.parse(localCredentialsData) : {}
-                };
-                event.source.postMessage(credentials, event.origin);
+                 var localCredentialsData = localStorage.getItem(localStorageKey);
+                if (localCredentialsData) {
+                    event.source.postMessage({
+                        name: postMessageEvent.RETURN_CREDENTIALS,
+                        data: JSON.parse(localCredentialsData)
+                    }, event.origin);
+                }
+                else {
+                    event.source.postMessage({
+                        name: postMessageEvent.LOGOUT,
+                    }, event.origin);
+                }
                 break;
             }
 
