@@ -9,7 +9,15 @@
 </head>
 <script defer>
     "use strict";
-    var allowedOrigins = ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002","https://waf.gotit.education","https://college.gotit.education"];
+    var allowedOrigins = [
+        "http://localhost:3000", 
+        "http://localhost:3001", 
+        "http://localhost:3002",
+        "https://waf.gotit.education",
+        "https://college.gotit.education",
+        "https://hh-tinhvqbk.vercel.app",
+        "https://hb-tinhvqbk.vercel.app"
+    ];
     var localStorageKey = "photostudy.crossDomainCredentials";
     var postMessageEvent = {
         REQUEST_CREDENTIALS: "request_credentials",
