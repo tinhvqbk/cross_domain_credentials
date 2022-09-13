@@ -60,6 +60,9 @@
             case postMessageEvent.SAVE_NEW_CREDENTIALS: {
                 var newCredentials = event.data.data;
                 localStorage.setItem(localStorageKey, JSON.stringify(newCredentials));
+                 event.source.postMessage({
+                    name: postMessageEvent.SAVE_CREDENTIALS,
+                }, event.origin);
                 break;
             }
             default: {
