@@ -2,79 +2,76 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CrossDomainCredentials - Photostudy</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CrossDomainCredentials - Photostudy</title>
 </head>
 <script defer>
-    "use strict";
-    var allowedOrigins = [
-        "http://localhost:3000", 
-        "http://localhost:3001", 
-        "http://localhost:3002",
-        "https://waf.gotit.education",
-        "https://college.gotit.education",
-        "https://hh-tinhvqbk.vercel.app",
-        "https://hb-tinhvqbk.vercel.app"
-    ];
-    var localStorageKey = "photostudy.crossDomainCredentials";
-    var postMessageEvent = {
-        REQUEST_CREDENTIALS: "request_credentials",
-        RETURN_CREDENTIALS: "return_credentials",
-        POST_LOGOUT: "post_logout",
-        LOGOUT: "logout",
-        SAVE_NEW_CREDENTIALS: "save_new_credentials",
-        SAVE_CREDENTIALS: "save_credentials",
+  "use strict";
+  var allowedOrigins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "https://waf.gotit.education",
+    "https://college.gotit.education",
+  ];
+  var localStorageKey = "photostudy.crossDomainCredentials";
+  var postMessageEvent = {
+    REQUEST_CREDENTIALS: "request_credentials",
+    RETURN_CREDENTIALS: "return_credentials",
+    POST_LOGOUT: "post_logout",
+    LOGOUT: "logout",
+    SAVE_NEW_CREDENTIALS: "save_new_credentials",
+    SAVE_CREDENTIALS: "save_credentials",
+  }
+  function handlePostMessage(event) {
+    if (allowedOrigins.indexOf(event.origin) === -1) {
+      return;
     }
-    function handlePostMessage(event) {
-        if (allowedOrigins.indexOf(event.origin) === -1) {
-            return;
+    console.log(`[MAIN IFRAME]: Received message from : `, event.origin, event.data);
+    switch (event.data.name) {
+      case postMessageEvent.REQUEST_CREDENTIALS: {
+        var localCredentialsData = JSON.parse(localStorage.getItem(localStorageKey));
+        if (localCredentialsData) {
+          event.source.postMessage({
+            name: postMessageEvent.RETURN_CREDENTIALS,
+            data: localCredentialsData
+          }, event.origin);
         }
-        console.log(`Received message from : `, event.origin, event);
-        switch (event.data.name) {
-            case postMessageEvent.REQUEST_CREDENTIALS: {
-                var localCredentialsData = JSON.parse(localStorage.getItem(localStorageKey));
-                if (localCredentialsData !== null) {
-                    event.source.postMessage({
-                        name: postMessageEvent.RETURN_CREDENTIALS,
-                        data: localCredentialsData
-                    }, event.origin);
-                }
-                else {
-                    event.source.postMessage({
-                        name: postMessageEvent.LOGOUT,
-                    }, event.origin);
-                }
-                break;
-            }
+        else {
+          event.source.postMessage({
+            name: postMessageEvent.LOGOUT,
+          }, event.origin);
+        }
+        break;
+      }
 
-            case postMessageEvent.POST_LOGOUT: {
-                var logout = {
-                    name: postMessageEvent.LOGOUT,
-                };
-                event.source.postMessage(logout, event.origin);
-                localStorage.setItem(localStorageKey, null);
-                break;
-            }
-            case postMessageEvent.SAVE_NEW_CREDENTIALS: {
-                var newCredentials = event.data.data;
-                localStorage.setItem(localStorageKey, JSON.stringify(newCredentials));
-                 event.source.postMessage({
-                    name: postMessageEvent.SAVE_CREDENTIALS,
-                }, event.origin);
-                break;
-            }
-            default: {
-                break;
-            }
-        }
+      case postMessageEvent.POST_LOGOUT: {
+        var logout = {
+          name: postMessageEvent.LOGOUT,
+        };
+        event.source.postMessage(logout, event.origin);
+        localStorage.setItem(localStorageKey, null);
+        break;
+      }
+      case postMessageEvent.SAVE_NEW_CREDENTIALS: {
+        var newCredentials = event.data.data;
+        event.source.postMessage({
+          name: postMessageEvent.SAVE_CREDENTIALS,
+        }, event.origin);
+        localStorage.setItem(localStorageKey, JSON.stringify(newCredentials));
+        break;
+      }
+      default: {
+        break;
+      }
     }
-    window.addEventListener('message', handlePostMessage);
+  }
+  window.addEventListener('message', handlePostMessage);
 </script>
 
 <body>
-    <div id="main">....</div>
+  <h1>CrossDomainCredentials</h1>
 </body>
 
 </html>
